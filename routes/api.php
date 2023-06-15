@@ -25,6 +25,8 @@ Route::group(['middleware' => 'auth:api'], function () {
 
 
     Route::get('products',[ProductController::class, 'list'])->name('product.list');
+    Route::get('products/get/{id}',[ProductController::class, 'details'])->name('product.get');
+
 
     Route::prefix('sales')->group(function () {
         Route::post('create', [SalesController::class, 'create'])->name('sales.create');
