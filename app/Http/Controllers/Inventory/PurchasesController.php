@@ -18,21 +18,28 @@ class PurchasesController extends BaseController
         } else {
             $input = $request->all();
         }
+        if(count($input)>0) {
 
-        foreach ($input as $key =>$value){
-            $purchases =  new Purchase();
+            foreach ($input as $key => $value) {
+                $purchases = new Purchase();
 
-            $purchases->product_id = $input[$key]['product_id'];
-            $purchases->quantity = $input[$key]['quantity'];
+                $purchases->product_id = $input[$key]['product_id'];
+                $purchases->quantity = $input[$key]['quantity'];
 
-            $purchases->save();
+                $purchases->save();
 
-            $product =  Product::find($input[$key]['product_id']);
-            $product->stock_qty = $product->stock_qty + $input[$key]['quantity'];
-            $product->update();
+                $product = Product::find($input[$key]['product_id']);
+                $product->stock_qty = $product->stock_qty + $input[$key]['quantity'];
+                $product->update();
+                return $this->sendResponse('', 'Purchase created Successfully');
+            }
         }
 
-        return $this->sendResponse('', 'Purchase created Successfully');
+        $data = [
+            'product' => 'Product is required',
+            'quantity' => 'Quantity is required'
+        ];
+        return $this->sendError($data, 'Validation issue');
 
     }
 }
