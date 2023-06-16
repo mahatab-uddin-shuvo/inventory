@@ -20,34 +20,38 @@ class SalesController extends BaseController
         }
 
 
-        foreach ($input as $key =>$value){
-            $sale =  new Sale();
-            $product =  Product::find($input[$key]['product_id']);
-            if($product->stock_qty<1){
-                $data = [
-                    'name' => $product->name,
-                    'msg' => 'this product is not available'
-                ];
-                return $this->sendError($data, 'Logical issue');
-            }elseif ($product->stock_qty < $input[$key]['quantity']){
-                $data = [
-                    'name' => $product->name,
-                    'msg' => 'We do not have your total product quantity'
-                ];
-                return $this->sendError($data, 'Logical issue');
-            }
-            else{
-                $sale->product_id = $input[$key]['product_id'];
-                $sale->quantity = $input[$key]['quantity'];
+        if(count($input)>0) {
+            foreach ($input as $key => $value) {
+                $sale = new Sale();
+                $product = Product::find($input[$key]['product_id']);
+                if ($product->stock_qty < 1) {
+                    $data = [
+                        'name' => $product->name,
+                        'msg' => 'this product is not available'
+                    ];
+                    return $this->sendError($data, 'Logical issue');
+                } elseif ($product->stock_qty < $input[$key]['quantity']) {
+                    $data = [
+                        'name' => $product->name,
+                        'msg' =>  'We do not have your total product quantity'
+                    ];
+                    return $this->sendError($data, 'Logical issue');
+                } else {
+                    $sale->product_id = $input[$key]['product_id'];
+                    $sale->quantity = $input[$key]['quantity'];
 
-                $sale->save();
+                    $sale->save();
 
-                $product->stock_qty = $product->stock_qty - $input[$key]['quantity'];
-                $product->update();
+                    $product->stock_qty = $product->stock_qty - $input[$key]['quantity'];
+                    $product->update();
+                    return $this->sendResponse('', 'Sales created Successfully');
+                }
             }
         }
-
-        return $this->sendResponse('', 'Sales created Successfully');
-
+        $data = [
+            'product' => 'Product is required',
+            'quantity' => 'Quantity is required'
+        ];
+        return $this->sendError($data, 'Validation issue');
     }
 }
