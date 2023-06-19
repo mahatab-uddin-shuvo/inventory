@@ -1,4 +1,5 @@
 project setup:
+
 composer install
 
 php artisan migrate
